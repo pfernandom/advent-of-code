@@ -1,0 +1,29 @@
+// Basic whitespace handling
+WHITESPACE = _{ " " | "\t" | "\n" | "\r" }
+COMMENT    = _{ ("//" ~ (!"\n" ~ ANY)*) | ("/*" ~ (!"*/" ~ ANY)* ~ "*/") }
+ident      = @{ WHITESPACE* ~ ("_" | "$")* ~ ASCII_ALPHANUMERIC ~ (ASCII_ALPHANUMERIC | "_")* ~ WHITESPACE* }
+quot      = _{ "\"" }
+char_quot = _{ "'" }
+num_literal  = @{ ASCII_DIGIT+ ~ ("." ~ ASCII_DIGIT*)? ~ ("F" | "L")? }
+str_literal  = @{ quot ~ ("\\\"" | (!quot ~ ANY))* ~ quot }
+char_literal = @{ char_quot ~ (!char_quot ~ ANY)* ~ char_quot }
+literal      =  { char_literal | str_literal | num_literal }
+
+
+cond_type = {"<" | ">"}
+part_name = {ident}
+work_flow_name = {ident}
+
+default_label = {ident}
+
+cond = {part_name ~ cond_type ~ num_literal ~ ":" ~ work_flow_name}
+rule_block = {work_flow_name ~ "{" ~ cond ~ ("," ~ cond)* ~ "," ~ default_label ~ "}"}
+
+
+part = {part_name ~ "="~ num_literal}
+parts = {"{" ~ part ~ ("," ~ part)*~ "}"}
+
+input = {rule_block+ ~ parts+}
+
+
+//{x=787,m=2655,a=1222,s=2876}
